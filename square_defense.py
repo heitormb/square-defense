@@ -27,8 +27,8 @@ AMARELO = (255, 220, 0)
 MENU_BG = pygame.image.load("menu.png").convert()
 MENU_BG = pygame.transform.scale(MENU_BG, (W, H))
 
-DEATH_BG = pygame.image.load("death.png").convert()
-DEATH_BG = pygame.transform.scale(DEATH_BG, (W, H))
+MORTE_BG = pygame.image.load("death.png").convert()
+MORTE_BG = pygame.transform.scale(MORTE_BG, (W, H))
 
 # CAMINHO(tá funcionando legal)
 CAMINHO = [
@@ -90,9 +90,9 @@ def menu_inicial():
 
         pygame.display.update()
 
-
+# acho que a tela de morte ficou boa, a gente podia colocar música no jogo depois né
 def tela_morte():
-    MAPA.blit(DEATH_BG, (0, 0))
+    MAPA.blit(MORTE_BG, (0, 0))
     pygame.display.update()
     pygame.time.delay(3000)
 
