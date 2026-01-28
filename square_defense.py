@@ -98,11 +98,16 @@ def tela_morte():
 
 # INIMIGOS(todos eles são betinhas buscando por redenção e sofrem com o sniper apelão)
 class Enemy:
-    def __init__(self):
+    def __init__(self, round_num):
         self.x, self.y = CAMINHO[0]
         self.velocidade = 1.5
-        self.hp = 40
-        self.max_hp = 40
+
+        base_hp = 40
+        multiplicador = 1.25 ** (round_num - 1)
+
+        self.max_hp = int(base_hp * multiplicador)
+        self.hp = self.max_hp
+
         self.caminho = 0
         self.cor = VERMELHO
 
@@ -124,19 +129,27 @@ class Enemy:
         pygame.draw.rect(tela, VERDE, (self.x-12, self.y-18, 25*(self.hp/self.max_hp), 4))
 
 class FastEnemy(Enemy):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, round_num):
+        super().__init__(round_num)
         self.velocidade = 2.5
-        self.hp = 30
-        self.max_hp = 30
+
+        base_hp = 30
+        multiplicador = 1.25 ** (round_num - 1)
+
+        self.max_hp = int(base_hp * multiplicador)
+        self.hp = self.max_hp
         self.cor = AMARELO
 
 class TankEnemy(Enemy):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, round_num):
+        super().__init__(round_num)
         self.velocidade = 1
-        self.hp = 100
-        self.max_hp = 100
+
+        base_hp = 100
+        multiplicador = 1.25 ** (round_num - 1)
+
+        self.max_hp = int(base_hp * multiplicador)
+        self.hp = self.max_hp
         self.cor = CINZA
 
 # TORRES(sniper apeelão mira jamais pinada)
@@ -145,7 +158,7 @@ class Tower:
     def __init__(self, x, y):
         self.x, self.y = x, y
         self.range = 120
-        self.dano = 5
+        self.dano = 7
         self.cooldown = 30
         self.cd = 0
         self.cor = AZUL
@@ -169,7 +182,7 @@ class MageTower(Tower):
     def __init__(self, x, y):
         super().__init__(x, y)
         self.range = 150
-        self.dano = 15
+        self.dano = 20
         self.cooldown = 40
         self.cor = ROXO
 
@@ -178,7 +191,7 @@ class SniperTower(Tower):
     def __init__(self, x, y):
         super().__init__(x, y)
         self.range = 300
-        self.dano = 35
+        self.dano = 40
         self.cooldown = 90
         self.cor = (150,150,255)
 
@@ -238,7 +251,8 @@ def main():
         if spawnar_inimigos > 0:
             spawn_timer+=1
             if spawn_timer>=40:
-                inimigos.append(random.choice([Enemy,FastEnemy,TankEnemy])())
+                tipo = random.choice([Enemy, FastEnemy, TankEnemy])
+                inimigos.append(tipo(round_num))
                 spawnar_inimigos-=1; spawn_timer=0
         elif not inimigos:
             round_num += 1
