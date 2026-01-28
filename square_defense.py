@@ -101,8 +101,8 @@ class Enemy:
     def __init__(self):
         self.x, self.y = CAMINHO[0]
         self.velocidade = 1.5
-        self.hp = 30
-        self.max_hp = 30
+        self.hp = 40
+        self.max_hp = 40
         self.caminho = 0
         self.cor = VERMELHO
 
@@ -127,21 +127,21 @@ class FastEnemy(Enemy):
     def __init__(self):
         super().__init__()
         self.velocidade = 2.5
-        self.hp = 20
-        self.max_hp = 20
+        self.hp = 30
+        self.max_hp = 30
         self.cor = AMARELO
 
 class TankEnemy(Enemy):
     def __init__(self):
         super().__init__()
         self.velocidade = 1
-        self.hp = 80
-        self.max_hp = 80
+        self.hp = 100
+        self.max_hp = 100
         self.cor = CINZA
 
 # TORRES(sniper apeelão mira jamais pinada)
 class Tower:
-    CUSTO = 50
+    CUSTO = 60
     def __init__(self, x, y):
         self.x, self.y = x, y
         self.range = 120
@@ -187,7 +187,7 @@ MENU_X = 900
 
 def desenhar_menu(tela, selecionado):
     pygame.draw.rect(tela, (40,40,40), (MENU_X,0,100,H))
-    items = [("Torre",50,AZUL),("Mago",80,ROXO),("Sniper",120,(150,150,255))]
+    items = [("Torre",60,AZUL),("Mago",80,ROXO),("Sniper",120,(150,150,255))]
     y = 40
     for i,(n,c,col) in enumerate(items):
         r = pygame.Rect(MENU_X+10,y,80,60)
@@ -228,7 +228,7 @@ def main():
                     selecionado = menu_selecionar((mx,my))
                 else:
                     if selecionado==0 and ouro>=50:
-                        torres.append(Tower(mx,my)); ouro-=50
+                        torres.append(Tower(mx,my)); ouro-=60
                     elif selecionado==1 and ouro>=80:
                         torres.append(MageTower(mx,my)); ouro-=80
                     elif selecionado==2 and ouro>=120:
