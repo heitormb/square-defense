@@ -211,8 +211,9 @@ def main():
     inimigos, torres = [], []
     ouro, vida, round_num = 150, 10, 1
     spawn_timer = 0
-    spawnar_inimigos = round_num * 6
     selecionado = None
+    i = 6
+    spawnar_inimigos = round_num * i
 
     while True:
         clock.tick(FPS)
@@ -234,14 +235,15 @@ def main():
                     elif selecionado==2 and ouro>=120:
                         torres.append(SniperTower(mx,my)); ouro-=120
 
-        if spawnar_inimigos>0:
+        if spawnar_inimigos > 0:
             spawn_timer+=1
             if spawn_timer>=40:
                 inimigos.append(random.choice([Enemy,FastEnemy,TankEnemy])())
                 spawnar_inimigos-=1; spawn_timer=0
         elif not inimigos:
-            round_num+=1; spawnar_inimigos=round_num*6
-
+            round_num += 1
+            i += 1
+            spawnar_inimigos = round_num * i
         for e in inimigos[:]:
             if e.movimento()=="BASE":
                 vida-=1; inimigos.remove(e)
