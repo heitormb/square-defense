@@ -27,6 +27,9 @@ AMARELO = (255, 220, 0)
 MENU_BG = pygame.image.load("menu.png").convert()
 MENU_BG = pygame.transform.scale(MENU_BG, (W, H))
 
+DEATH_BG = pygame.image.load("death.png").convert()
+DEATH_BG = pygame.transform.scale(DEATH_BG, (W, H))
+
 # CAMINHO(tá funcionando legal)
 CAMINHO = [
     (0, 300),
@@ -86,6 +89,12 @@ def menu_inicial():
                     sys.exit()
 
         pygame.display.update()
+
+
+def tela_morte():
+    MAPA.blit(DEATH_BG, (0, 0))
+    pygame.display.update()
+    pygame.time.delay(3000)
 
 # INIMIGOS(todos eles são betinhas buscando por redenção e sofrem com o sniper apelão)
 class Enemy:
@@ -247,10 +256,12 @@ def main():
         MAPA.blit(FONTE.render(f"$ {ouro}   vida: {vida}   Round {round_num}",True,BRANCO),(10,10))
         pygame.display.update()
 
-        if vida<=0:
-            pygame.quit(); sys.exit()
+        if vida <= 0:
+            tela_morte()
+            return 
 
 # EXECUÇÃO(fruto lindo do nosso trabalho)
 if __name__ == "__main__":
-    menu_inicial()
-    main()
+    while True:
+        menu_inicial()
+        main()
