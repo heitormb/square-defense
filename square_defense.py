@@ -100,7 +100,7 @@ def tela_morte():
 class Enemy:
     def __init__(self):
         self.x, self.y = CAMINHO[0]
-        self.velocidade = 1.2
+        self.velocidade = 1.5
         self.hp = 30
         self.max_hp = 30
         self.caminho = 0
@@ -126,7 +126,7 @@ class Enemy:
 class FastEnemy(Enemy):
     def __init__(self):
         super().__init__()
-        self.velocidade = 2.3
+        self.velocidade = 2.5
         self.hp = 20
         self.max_hp = 20
         self.cor = AMARELO
@@ -134,7 +134,7 @@ class FastEnemy(Enemy):
 class TankEnemy(Enemy):
     def __init__(self):
         super().__init__()
-        self.velocidade = 0.7
+        self.velocidade = 1
         self.hp = 80
         self.max_hp = 80
         self.cor = CINZA
@@ -178,7 +178,7 @@ class SniperTower(Tower):
     def __init__(self, x, y):
         super().__init__(x, y)
         self.range = 300
-        self.dano = 40
+        self.dano = 30
         self.cooldown = 90
         self.cor = (150,150,255)
 
