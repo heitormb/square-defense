@@ -169,7 +169,7 @@ class MageTower(Tower):
     def __init__(self, x, y):
         super().__init__(x, y)
         self.range = 150
-        self.dano = 8
+        self.dano = 15
         self.cooldown = 40
         self.cor = ROXO
 
@@ -178,7 +178,7 @@ class SniperTower(Tower):
     def __init__(self, x, y):
         super().__init__(x, y)
         self.range = 300
-        self.dano = 30
+        self.dano = 35
         self.cooldown = 90
         self.cor = (150,150,255)
 
@@ -227,7 +227,7 @@ def main():
                 if mx>=MENU_X:
                     selecionado = menu_selecionar((mx,my))
                 else:
-                    if selecionado==0 and ouro>=50:
+                    if selecionado==0 and ouro>=60:
                         torres.append(Tower(mx,my)); ouro-=60
                     elif selecionado==1 and ouro>=80:
                         torres.append(MageTower(mx,my)); ouro-=80
