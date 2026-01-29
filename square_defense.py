@@ -102,7 +102,7 @@ class Enemy:
         self.x, self.y = CAMINHO[0]
         self.velocidade = 1.5
 
-        base_hp = 40
+        base_hp = 50
         multiplicador = 1.30 ** (round_num - 1)
 
         self.max_hp = int(base_hp * multiplicador)
@@ -145,7 +145,7 @@ class TankEnemy(Enemy):
         super().__init__(round_num)
         self.velocidade = 1
 
-        base_hp = 100
+        base_hp = 80
         multiplicador = 1.30 ** (round_num - 1)
 
         self.max_hp = int(base_hp * multiplicador)
@@ -191,7 +191,7 @@ class SniperTower(Tower):
     def __init__(self, x, y):
         super().__init__(x, y)
         self.range = 300
-        self.dano = 40
+        self.dano = 60
         self.cooldown = 90
         self.cor = (150,150,255)
 
