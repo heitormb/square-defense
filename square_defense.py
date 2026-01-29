@@ -103,7 +103,7 @@ class Enemy:
         self.velocidade = 1.5
 
         base_hp = 40
-        multiplicador = 1.25 ** (round_num - 1)
+        multiplicador = 1.30 ** (round_num - 1)
 
         self.max_hp = int(base_hp * multiplicador)
         self.hp = self.max_hp
@@ -134,7 +134,7 @@ class FastEnemy(Enemy):
         self.velocidade = 2.5
 
         base_hp = 30
-        multiplicador = 1.25 ** (round_num - 1)
+        multiplicador = 1.30 ** (round_num - 1)
 
         self.max_hp = int(base_hp * multiplicador)
         self.hp = self.max_hp
@@ -146,7 +146,7 @@ class TankEnemy(Enemy):
         self.velocidade = 1
 
         base_hp = 100
-        multiplicador = 1.25 ** (round_num - 1)
+        multiplicador = 1.30 ** (round_num - 1)
 
         self.max_hp = int(base_hp * multiplicador)
         self.hp = self.max_hp
@@ -154,7 +154,7 @@ class TankEnemy(Enemy):
 
 # TORRES(sniper apeelão mira jamais pinada)
 class Tower:
-    CUSTO = 60
+    CUSTO = 50
     def __init__(self, x, y):
         self.x, self.y = x, y
         self.range = 120
@@ -200,10 +200,10 @@ MENU_X = 900
 
 def desenhar_menu(tela, selecionado):
     pygame.draw.rect(tela, (40,40,40), (MENU_X,0,100,H))
-    items = [("Torre",60,AZUL),("Mago",80,ROXO),("Sniper",120,(150,150,255))]
+    items = [("Torre",50,AZUL),("Mago",80,ROXO),("Sniper",120,(150,150,255))]
     y = 40
     for i,(n,c,col) in enumerate(items):
-        r = pygame.Rect(MENU_X+10,y,80,60)
+        r = pygame.Rect(MENU_X+10,y,80,50)
         if selecionado == i:
             pygame.draw.rect(tela, AMARELO, r, 3)
         pygame.draw.rect(tela,col,r)
@@ -241,8 +241,8 @@ def main():
                 if mx>=MENU_X:
                     selecionado = menu_selecionar((mx,my))
                 else:
-                    if selecionado==0 and ouro>=60:
-                        torres.append(Tower(mx,my)); ouro-=60
+                    if selecionado==0 and ouro>=50:
+                        torres.append(Tower(mx,my)); ouro-=50
                     elif selecionado==1 and ouro>=80:
                         torres.append(MageTower(mx,my)); ouro-=80
                     elif selecionado==2 and ouro>=120:
