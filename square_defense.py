@@ -131,7 +131,7 @@ class Enemy:
 class FastEnemy(Enemy):
     def __init__(self, round_num):
         super().__init__(round_num)
-        self.velocidade = 2.5
+        self.velocidade = 2.0
 
         base_hp = 30
         multiplicador = 1.30 ** (round_num - 1)
@@ -158,7 +158,7 @@ class Tower:
     def __init__(self, x, y):
         self.x, self.y = x, y
         self.range = 120
-        self.dano = 7
+        self.dano = 8
         self.cooldown = 30
         self.cd = 0
         self.cor = AZUL
