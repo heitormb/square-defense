@@ -40,6 +40,16 @@ SNIPER_IMG = pygame.transform.scale(
     pygame.image.load("sniper.png").convert_alpha(), (120, 120)
 )
 
+MENU_LARGURA = 160
+MENU_X = W - MENU_LARGURA
+BOTAO_TAM = 140
+
+MENU_BOTOES = [
+    pygame.Rect(MENU_X + 10, 40,  BOTAO_TAM, BOTAO_TAM),
+    pygame.Rect(MENU_X + 10, 230, BOTAO_TAM, BOTAO_TAM),
+    pygame.Rect(MENU_X + 10, 420, BOTAO_TAM, BOTAO_TAM)
+]
+
 
 # CAMINHO(tá funcionando legal)
 CAMINHO = [
@@ -174,7 +184,8 @@ class Tower:
         self.cd = 0
 
     def desenhar(self, tela):
-        tela.blit(TOWER_IMG, (self.x - 20, self.y - 20))
+        rect = TOWER_IMG.get_rect(center=(self.x, self.y))
+        tela.blit(TOWER_IMG, rect)
         pygame.draw.circle(tela, (0, 0, 80), (self.x, self.y), self.range, 1)
 
     def atirar(self, inimigos):
@@ -196,9 +207,9 @@ class MageTower(Tower):
         self.cooldown = 40
 
     def desenhar(self, tela):
-        tela.blit(MAGE_IMG, (self.x-20, self.y-20))
+        rect = MAGE_IMG.get_rect(center=(self.x, self.y))
+        tela.blit(MAGE_IMG, rect)
         pygame.draw.circle(tela, ROXO, (self.x, self.y), self.range, 1)
-
 
 class SniperTower(Tower):
     CUSTO = 120
@@ -209,39 +220,26 @@ class SniperTower(Tower):
         self.cooldown = 90
 
     def desenhar(self, tela):
-        tela.blit(SNIPER_IMG, (self.x-20, self.y-20))
+        rect = SNIPER_IMG.get_rect(center=(self.x, self.y))
+        tela.blit(SNIPER_IMG, rect)
         pygame.draw.circle(tela, (150,150,255), (self.x, self.y), self.range, 1)
 
 # HUD(não tenho muito o que dizer)
-MENU_X = 900
 
-def desenhar_menu(tela, selecionado):
-    pygame.draw.rect(tela, (40,40,40), (MENU_X,0,100,H))
-
-    items = [
-        (TOWER_IMG, 50),
-        (MAGE_IMG, 80),
-        (SNIPER_IMG, 120)
-    ]
-
-    y = 40
-    for i, (img, custo) in enumerate(items):
-        r = pygame.Rect(MENU_X+10, y, 80, 60)
-
-        if selecionado == i:
-            pygame.draw.rect(tela, AMARELO, r, 3)
-
-        tela.blit(img, (MENU_X + 30, y + 10))
-        tela.blit(FONTE.render(f"${custo}", True, BRANCO), (MENU_X+25, y+65))
-
-        y += 120
+def desenhar_menu(tela, sel):
+    pygame.draw.rect(tela,(40,40,40),(MENU_X,0,MENU_LARGURA,H))
+    torres=[(TOWER_IMG,50, "Guerreiro"),(MAGE_IMG,80, "Mago"),(SNIPER_IMG,120, "Sniper")]
+    for i,(img,c, nome) in enumerate(torres):
+        b=MENU_BOTOES[i]
+        pygame.draw.rect(tela,AMARELO if sel==i else (80,80,80),b,4 if sel==i else 2)
+        tela.blit(img,img.get_rect(center=b.center))
+        tela.blit(FONTE.render(f"${c}",True,BRANCO),(b.x+20,b.bottom+5))
+        tela.blit(FONTE.render(f"{nome}", True, BRANCO), (b.x+60, b.bottom+5))
 
 def menu_selecionar(pos):
-    x,y = pos
-    if x < MENU_X: return None
-    if 40<=y<=100: return 0
-    if 160<=y<=220: return 1
-    if 280<=y<=340: return 2
+    for i, botao in enumerate(MENU_BOTOES):
+        if botao.collidepoint(pos):
+            return i
     return None
 
 # JOGO PRINCIPAL(bora focar mais nessa parte aqui Arthur)
