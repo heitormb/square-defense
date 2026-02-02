@@ -30,6 +30,17 @@ MENU_BG = pygame.transform.scale(MENU_BG, (W, H))
 MORTE_BG = pygame.image.load("death.png").convert()
 MORTE_BG = pygame.transform.scale(MORTE_BG, (W, H))
 
+TOWER_IMG = pygame.transform.scale(
+    pygame.image.load("tower.png").convert_alpha(), (120, 120)
+)
+MAGE_IMG = pygame.transform.scale(
+    pygame.image.load("mage.png").convert_alpha(), (120, 120)
+)
+SNIPER_IMG = pygame.transform.scale(
+    pygame.image.load("sniper.png").convert_alpha(), (120, 120)
+)
+
+
 # CAMINHO(tá funcionando legal)
 CAMINHO = [
     (0, 300),
@@ -161,10 +172,9 @@ class Tower:
         self.dano = 8
         self.cooldown = 30
         self.cd = 0
-        self.cor = AZUL
 
     def desenhar(self, tela):
-        pygame.draw.rect(tela, self.cor, (self.x-15, self.y-15, 30, 30))
+        tela.blit(TOWER_IMG, (self.x - 20, self.y - 20))
         pygame.draw.circle(tela, (0, 0, 80), (self.x, self.y), self.range, 1)
 
     def atirar(self, inimigos):
@@ -184,7 +194,11 @@ class MageTower(Tower):
         self.range = 150
         self.dano = 20
         self.cooldown = 40
-        self.cor = ROXO
+
+    def desenhar(self, tela):
+        tela.blit(MAGE_IMG, (self.x-20, self.y-20))
+        pygame.draw.circle(tela, ROXO, (self.x, self.y), self.range, 1)
+
 
 class SniperTower(Tower):
     CUSTO = 120
@@ -193,22 +207,34 @@ class SniperTower(Tower):
         self.range = 300
         self.dano = 60
         self.cooldown = 90
-        self.cor = (150,150,255)
+
+    def desenhar(self, tela):
+        tela.blit(SNIPER_IMG, (self.x-20, self.y-20))
+        pygame.draw.circle(tela, (150,150,255), (self.x, self.y), self.range, 1)
 
 # HUD(não tenho muito o que dizer)
 MENU_X = 900
 
 def desenhar_menu(tela, selecionado):
     pygame.draw.rect(tela, (40,40,40), (MENU_X,0,100,H))
-    items = [("Torre",50,AZUL),("Mago",80,ROXO),("Sniper",120,(150,150,255))]
+
+    items = [
+        (TOWER_IMG, 50),
+        (MAGE_IMG, 80),
+        (SNIPER_IMG, 120)
+    ]
+
     y = 40
-    for i,(n,c,col) in enumerate(items):
-        r = pygame.Rect(MENU_X+10,y,80,50)
+    for i, (img, custo) in enumerate(items):
+        r = pygame.Rect(MENU_X+10, y, 80, 60)
+
         if selecionado == i:
             pygame.draw.rect(tela, AMARELO, r, 3)
-        pygame.draw.rect(tela,col,r)
-        tela.blit(FONTE.render(f"{n} ${c}",True,BRANCO),(MENU_X+5,y+65))
-        y+=120
+
+        tela.blit(img, (MENU_X + 30, y + 10))
+        tela.blit(FONTE.render(f"${custo}", True, BRANCO), (MENU_X+25, y+65))
+
+        y += 120
 
 def menu_selecionar(pos):
     x,y = pos
