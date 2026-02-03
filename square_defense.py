@@ -4,6 +4,7 @@ import random
 import sys
 
 pygame.init()
+pygame.mixer.init()
 
 # CONFIGIGURAÇÕES(essa parte a gente deixa quieto porque tá funcionando bem)
 W, H = 1000, 600
@@ -39,6 +40,14 @@ MAGE_IMG = pygame.transform.scale(
 SNIPER_IMG = pygame.transform.scale(
     pygame.image.load("sniper.png").convert_alpha(), (120, 120)
 )
+
+MUSICA_MENU = "menu.wav"
+MUSICA_JOGO = "game.wav"
+MUSICA_MORTE = "death.wav"
+
+def tocar_musica(arquivo, loop=True):
+    pygame.mixer.music.load(arquivo)
+    pygame.mixer.music.play(-1 if loop else 0)
 
 MENU_LARGURA = 160
 MENU_X = W - MENU_LARGURA
@@ -82,6 +91,7 @@ def criar_background(tela):
 # MENU INICIAL(menu lindo e perfeito cem porcento genial feito pelo gênio ignóbio Mascena)
 def menu_inicial():
     clock = pygame.time.Clock()
+    tocar_musica(MUSICA_MENU)
 
     jogar_btn = pygame.Rect(W//2 - 110, 300, 220, 60)
     sair_btn  = pygame.Rect(W//2 - 110, 390, 220, 60)
@@ -113,6 +123,7 @@ def menu_inicial():
 
 # acho que a tela de morte ficou boa, a gente podia colocar música no jogo depois né
 def tela_morte():
+    tocar_musica(MUSICA_MORTE, loop=False)
     MAPA.blit(MORTE_BG, (0, 0))
     pygame.display.update()
     pygame.time.delay(3000)
@@ -244,6 +255,7 @@ def menu_selecionar(pos):
 
 # JOGO PRINCIPAL(bora focar mais nessa parte aqui Arthur)
 def main():
+    tocar_musica(MUSICA_JOGO)
     clock = pygame.time.Clock()
     inimigos, torres = [], []
     ouro, vida, round_num = 150, 10, 1
