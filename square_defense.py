@@ -194,10 +194,16 @@ class Tower:
         self.cooldown = 30
         self.cd = 0
 
-    def desenhar(self, tela):
+    def mouse_em_cima(self, mouse_pos):
+        mx, my = mouse_pos
+        return math.hypot(self.x - mx, self.y - my) <= 60
+
+    def desenhar(self, tela, mouse_pos):
         rect = TOWER_IMG.get_rect(center=(self.x + 10, self.y))
         tela.blit(TOWER_IMG, rect)
-        pygame.draw.circle(tela, (0, 0, 80), (self.x, self.y), self.range, 1)
+
+        if self.mouse_em_cima(mouse_pos):
+            pygame.draw.circle(tela, (0, 0, 80), (self.x, self.y), self.range, 2)
 
     def atirar(self, inimigos):
         if self.cd < self.cooldown:
@@ -217,10 +223,12 @@ class MageTower(Tower):
         self.dano = 20
         self.cooldown = 40
 
-    def desenhar(self, tela):
+    def desenhar(self, tela, mouse_pos):
         rect = MAGE_IMG.get_rect(center=(self.x + 10, self.y))
         tela.blit(MAGE_IMG, rect)
-        pygame.draw.circle(tela, ROXO, (self.x, self.y), self.range, 1)
+
+        if self.mouse_em_cima(mouse_pos):
+            pygame.draw.circle(tela, ROXO, (self.x, self.y), self.range, 2)
 
 class SniperTower(Tower):
     CUSTO = 120
@@ -230,10 +238,12 @@ class SniperTower(Tower):
         self.dano = 60
         self.cooldown = 90
 
-    def desenhar(self, tela):
+    def desenhar(self, tela, mouse_pos):
         rect = SNIPER_IMG.get_rect(center=(self.x + 10, self.y))
         tela.blit(SNIPER_IMG, rect)
-        pygame.draw.circle(tela, (150,150,255), (self.x, self.y), self.range, 1)
+
+        if self.mouse_em_cima(mouse_pos):
+            pygame.draw.circle(tela, (150,150,255), (self.x, self.y), self.range, 2)
 
 # HUD(não tenho muito o que dizer)
 
@@ -267,6 +277,8 @@ def main():
 
     while True:
         clock.tick(FPS)
+        mouse_pos = pygame.mouse.get_pos()
+        
         criar_background(MAPA)
         pygame.draw.lines(MAPA,(200,180,100),False,CAMINHO,10)
 
@@ -303,7 +315,8 @@ def main():
 
         for t in torres: t.atirar(inimigos)
         for e in inimigos: e.desenhar(MAPA)
-        for t in torres: t.desenhar(MAPA)
+        for t in torres:
+            t.desenhar(MAPA, mouse_pos)
 
         desenhar_menu(MAPA, selecionado)
         MAPA.blit(FONTE.render(f"$ {ouro}   vida: {vida}   Round {round_num}",True,BRANCO),(10,10))
