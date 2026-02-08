@@ -24,26 +24,26 @@ ROXO = (170, 80, 255)
 CINZA = (120, 120, 120)
 AMARELO = (255, 220, 0)
 
-# IMAGEM DO MENU(imagem do menu(feita pelo artist genial e incrível Mascena))
-MENU_BG = pygame.image.load("menu.png").convert()
+# IMAGEM DO MENU(feita pelo artist genial e incrível Mascena)
+MENU_BG = pygame.image.load("imagens/menu.png").convert()
 MENU_BG = pygame.transform.scale(MENU_BG, (W, H))
 
-MORTE_BG = pygame.image.load("death.png").convert()
+MORTE_BG = pygame.image.load("imagens/death.png").convert()
 MORTE_BG = pygame.transform.scale(MORTE_BG, (W, H))
 
 TOWER_IMG = pygame.transform.scale(
-    pygame.image.load("tower.png").convert_alpha(), (120, 120)
+    pygame.image.load("imagens/tower.png").convert_alpha(), (120, 120)
 )
 MAGE_IMG = pygame.transform.scale(
-    pygame.image.load("mage.png").convert_alpha(), (120, 120)
+    pygame.image.load("imagens/mage.png").convert_alpha(), (120, 120)
 )
 SNIPER_IMG = pygame.transform.scale(
-    pygame.image.load("sniper.png").convert_alpha(), (120, 120)
+    pygame.image.load("imagens/sniper.png").convert_alpha(), (120, 120)
 )
 
-MUSICA_MENU = "menu.wav"
-MUSICA_JOGO = "game.wav"
-MUSICA_MORTE = "death.wav"
+MUSICA_MENU = "som/menu.wav"
+MUSICA_JOGO = "som/game.wav"
+MUSICA_MORTE = "som/death.wav"
 
 def tocar_musica(arquivo, loop=True):
     pygame.mixer.music.load(arquivo)
@@ -254,7 +254,7 @@ def menu_selecionar(pos):
             return i
     return None
 
-# JOGO PRINCIPAL(bora focar mais nessa parte aqui Arthur)
+# JOGO PRINCIPAL
 def main():
     tocar_musica(MUSICA_JOGO)
     clock = pygame.time.Clock()
