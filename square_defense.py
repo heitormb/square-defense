@@ -195,7 +195,7 @@ class Tower:
         self.cd = 0
 
     def desenhar(self, tela):
-        rect = TOWER_IMG.get_rect(center=(self.x, self.y))
+        rect = TOWER_IMG.get_rect(center=(self.x + 10, self.y))
         tela.blit(TOWER_IMG, rect)
         pygame.draw.circle(tela, (0, 0, 80), (self.x, self.y), self.range, 1)
 
@@ -218,7 +218,7 @@ class MageTower(Tower):
         self.cooldown = 40
 
     def desenhar(self, tela):
-        rect = MAGE_IMG.get_rect(center=(self.x, self.y))
+        rect = MAGE_IMG.get_rect(center=(self.x + 10, self.y))
         tela.blit(MAGE_IMG, rect)
         pygame.draw.circle(tela, ROXO, (self.x, self.y), self.range, 1)
 
@@ -231,7 +231,7 @@ class SniperTower(Tower):
         self.cooldown = 90
 
     def desenhar(self, tela):
-        rect = SNIPER_IMG.get_rect(center=(self.x, self.y))
+        rect = SNIPER_IMG.get_rect(center=(self.x + 10, self.y))
         tela.blit(SNIPER_IMG, rect)
         pygame.draw.circle(tela, (150,150,255), (self.x, self.y), self.range, 1)
 
@@ -243,7 +243,8 @@ def desenhar_menu(tela, sel):
     for i,(img,c, nome) in enumerate(torres):
         b=MENU_BOTOES[i]
         pygame.draw.rect(tela,AMARELO if sel==i else (80,80,80),b,4 if sel==i else 2)
-        tela.blit(img,img.get_rect(center=b.center))
+        img_rect = img.get_rect(center=(b.centerx + 7, b.centery + 5))
+        tela.blit(img, img_rect)
         tela.blit(FONTE.render(f"${c}",True,BRANCO),(b.x+20,b.bottom+5))
         tela.blit(FONTE.render(f"{nome}", True, BRANCO), (b.x+60, b.bottom+5))
 
@@ -278,11 +279,11 @@ def main():
                     selecionado = menu_selecionar((mx,my))
                 else:
                     if selecionado==0 and ouro>=50:
-                        torres.append(Tower(mx,my)); ouro-=50
+                        torres.append(Tower(mx, my)); ouro-=50
                     elif selecionado==1 and ouro>=80:
-                        torres.append(MageTower(mx,my)); ouro-=80
+                        torres.append(MageTower(mx, my)); ouro-=80
                     elif selecionado==2 and ouro>=120:
-                        torres.append(SniperTower(mx,my)); ouro-=120
+                        torres.append(SniperTower(mx, my)); ouro-=120
 
         if spawnar_inimigos > 0:
             spawn_timer+=1
