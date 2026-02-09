@@ -184,6 +184,32 @@ class TankEnemy(Enemy):
         self.hp = self.max_hp
         self.cor = CINZA
 
+class BossEnemy(Enemy):
+    def __init__(self, round_num):
+        super().__init__(round_num)
+        self.velocidade = 0.8
+        self.cor = (255, 140, 0)  # laranja
+
+        base_hp = 1000
+        multiplicador = 1.30 ** (round_num - 1)
+
+        self.max_hp = int(base_hp * multiplicador)
+        self.hp = self.max_hp
+
+    def desenhar(self, tela):
+        pygame.draw.rect(
+            tela,
+            self.cor,
+            (self.x - 20, self.y - 20, 40, 40)
+        )
+
+        pygame.draw.rect(tela, PRETO, (self.x-22, self.y-28, 44, 6))
+        pygame.draw.rect(
+            tela,
+            VERDE,
+            (self.x-22, self.y-28, 44*(self.hp/self.max_hp), 6)
+        )
+
 # TORRES(sniper apeelão mira jamais pinada)
 class Tower:
     CUSTO = 50
@@ -247,9 +273,13 @@ class SniperTower(Tower):
 
 # HUD(não tenho muito o que dizer)
 
-def desenhar_menu(tela, sel):
+def desenhar_menu(tela, sel, qg, qm, qs):
     pygame.draw.rect(tela,(40,40,40),(MENU_X,0,MENU_LARGURA,H))
-    torres=[(TOWER_IMG,50, "Guerreiro"),(MAGE_IMG,80, "Mago"),(SNIPER_IMG,120, "Sniper")]
+    torres = [
+    (TOWER_IMG, custo_progressivo(50, qg), "Guerreiro"),
+    (MAGE_IMG, custo_progressivo(80, qm), "Mago"),
+    (SNIPER_IMG, custo_progressivo(120, qs), "Sniper")
+]
     for i,(img,c, nome) in enumerate(torres):
         b=MENU_BOTOES[i]
         pygame.draw.rect(tela,AMARELO if sel==i else (80,80,80),b,4 if sel==i else 2)
@@ -264,21 +294,34 @@ def menu_selecionar(pos):
             return i
     return None
 
+def custo_progressivo(base, qtd):
+    return int(base * (1.10 ** qtd))
+
 # JOGO PRINCIPAL
 def main():
     tocar_musica(MUSICA_JOGO)
     clock = pygame.time.Clock()
-    inimigos, torres = [], []
+    inimigos = []
+    torres = []
+
+    qtd_guerreiro = 0
+    qtd_mago = 0
+    qtd_sniper = 0
+
     ouro, vida, round_num = 150, 10, 1
     spawn_timer = 0
     selecionado = None
     i = 6
     spawnar_inimigos = round_num * i
+    boss_fila = 0
+
+    if round_num % 5 == 0:
+        boss_fila = 2 ** ((round_num // 5) - 1)
 
     while True:
         clock.tick(FPS)
         mouse_pos = pygame.mouse.get_pos()
-        
+
         criar_background(MAPA)
         pygame.draw.lines(MAPA,(200,180,100),False,CAMINHO,10)
 
@@ -290,35 +333,70 @@ def main():
                 if mx>=MENU_X:
                     selecionado = menu_selecionar((mx,my))
                 else:
-                    if selecionado==0 and ouro>=50:
-                        torres.append(Tower(mx, my)); ouro-=50
-                    elif selecionado==1 and ouro>=80:
-                        torres.append(MageTower(mx, my)); ouro-=80
-                    elif selecionado==2 and ouro>=120:
-                        torres.append(SniperTower(mx, my)); ouro-=120
+                    if selecionado == 0:
+                        custo = custo_progressivo(50, qtd_guerreiro)
+                        if ouro >= custo:
+                            torres.append(Tower(mx, my))
+                            ouro -= custo
+                            qtd_guerreiro += 1
 
-        if spawnar_inimigos > 0:
-            spawn_timer+=1
-            if spawn_timer>=40:
+                    elif selecionado == 1:
+                        custo = custo_progressivo(80, qtd_mago)
+                        if ouro >= custo:
+                            torres.append(MageTower(mx, my))
+                            ouro -= custo
+                            qtd_mago += 1
+
+                    elif selecionado == 2:
+                        custo = custo_progressivo(120, qtd_sniper)
+                        if ouro >= custo:
+                            torres.append(SniperTower(mx, my))
+                            ouro -= custo
+                            qtd_sniper += 1
+
+        if boss_fila > 0:
+            spawn_timer += 1
+            if spawn_timer >= 90:
+                inimigos.append(BossEnemy(round_num))
+                boss_fila -= 1
+                spawn_timer = 0
+
+        elif spawnar_inimigos > 0:
+            spawn_timer += 1
+            if spawn_timer >= 40:
                 tipo = random.choice([Enemy, FastEnemy, TankEnemy])
                 inimigos.append(tipo(round_num))
-                spawnar_inimigos-=1; spawn_timer=0
+                spawnar_inimigos -= 1
+                spawn_timer = 0
         elif not inimigos:
             round_num += 1
             i += 1
             spawnar_inimigos = round_num * i
+            boss_fila = 0
+
+            if round_num % 5 == 0:
+                boss_fila = 2 ** ((round_num // 5) - 1)
         for e in inimigos[:]:
-            if e.movimento()=="BASE":
-                vida-=1; inimigos.remove(e)
-            elif e.hp<=0:
-                ouro+=10; inimigos.remove(e)
+            if e.movimento() == "BASE":
+                if isinstance(e, FastEnemy):
+                    vida -= 1
+                elif isinstance(e, BossEnemy):
+                    vida -= 5
+                else:
+                    vida -= 1
+                inimigos.remove(e)
+            elif e.hp <= 0:
+                reducao = (round_num // 5) * 2
+                ganho = max(2, 14 - reducao)
+                ouro += ganho
+                inimigos.remove(e)
 
         for t in torres: t.atirar(inimigos)
         for e in inimigos: e.desenhar(MAPA)
         for t in torres:
             t.desenhar(MAPA, mouse_pos)
 
-        desenhar_menu(MAPA, selecionado)
+        desenhar_menu(MAPA, selecionado, qtd_guerreiro, qtd_mago, qtd_sniper)
         MAPA.blit(FONTE.render(f"$ {ouro}   vida: {vida}   Round {round_num}",True,BRANCO),(10,10))
         pygame.display.update()
 
