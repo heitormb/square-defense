@@ -190,7 +190,7 @@ class BossEnemy(Enemy):
         self.velocidade = 0.8
         self.cor = (255, 140, 0)  # laranja
 
-        base_hp = 1000
+        base_hp = 750
         multiplicador = 1.30 ** (round_num - 1)
 
         self.max_hp = int(base_hp * multiplicador)
@@ -321,6 +321,8 @@ def main():
     while True:
         clock.tick(FPS)
         mouse_pos = pygame.mouse.get_pos()
+        spawn_delay_normal = max(12, 40 - round_num * 1.5)
+        spawn_delay_boss = max(40, 90 - round_num * 2)
 
         criar_background(MAPA)
         pygame.draw.lines(MAPA,(200,180,100),False,CAMINHO,10)
@@ -356,14 +358,14 @@ def main():
 
         if boss_fila > 0:
             spawn_timer += 1
-            if spawn_timer >= 90:
+            if spawn_timer >= spawn_delay_boss:
                 inimigos.append(BossEnemy(round_num))
                 boss_fila -= 1
                 spawn_timer = 0
 
         elif spawnar_inimigos > 0:
             spawn_timer += 1
-            if spawn_timer >= 40:
+            if spawn_timer >= spawn_delay_normal:
                 tipo = random.choice([Enemy, FastEnemy, TankEnemy])
                 inimigos.append(tipo(round_num))
                 spawnar_inimigos -= 1
