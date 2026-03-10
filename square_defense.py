@@ -32,13 +32,13 @@ MORTE_BG = pygame.image.load("imagens/death.png").convert()
 MORTE_BG = pygame.transform.scale(MORTE_BG, (W, H))
 
 TOWER_IMG = pygame.transform.scale(
-    pygame.image.load("imagens/tower.png").convert_alpha(), (120, 120)
+    pygame.image.load("imagens/tower.png").convert_alpha(), (90, 90)
 )
 MAGE_IMG = pygame.transform.scale(
-    pygame.image.load("imagens/mage.png").convert_alpha(), (120, 120)
+    pygame.image.load("imagens/mage.png").convert_alpha(), (90, 90)
 )
 SNIPER_IMG = pygame.transform.scale(
-    pygame.image.load("imagens/sniper.png").convert_alpha(), (120, 120)
+    pygame.image.load("imagens/sniper.png").convert_alpha(), (90, 90)
 )
 ICE_IMG = pygame.transform.scale(
     pygame.image.load("imagens/ice.png").convert_alpha(), (120, 120)
@@ -46,9 +46,23 @@ ICE_IMG = pygame.transform.scale(
 TESLA_IMG = pygame.transform.scale(
     pygame.image.load("imagens/tesla.png").convert_alpha(), (120, 120)
 )
+POISON_IMG = pygame.transform.scale(
+    pygame.image.load("imagens/poison.png").convert_alpha(), (120, 120)
+)
+FIRE_IMG = pygame.transform.scale(
+    pygame.image.load("imagens/fire.png").convert_alpha(), (100, 100)
+)
 
-MUSICA_MENU = "som/menu.wav"
-MUSICA_JOGO = "som/game.wav"
+MENU_TOWER_IMG  = pygame.transform.scale(TOWER_IMG, (60, 60))
+MENU_MAGE_IMG   = pygame.transform.scale(MAGE_IMG, (60, 60))
+MENU_SNIPER_IMG = pygame.transform.scale(SNIPER_IMG, (60, 60))
+MENU_ICE_IMG    = pygame.transform.scale(ICE_IMG, (60, 60))
+MENU_TESLA_IMG  = pygame.transform.scale(TESLA_IMG, (90, 90))
+MENU_POISON_IMG = pygame.transform.scale(POISON_IMG, (60, 60))
+MENU_FIRE_IMG   = pygame.transform.scale(FIRE_IMG, (60, 60))
+
+MUSICA_MENU = "som/menu_theme_v3.wav"
+MUSICA_JOGO = "som/game_theme_v2.wav"
 MUSICA_MORTE = "som/death.wav"
 
 def tocar_musica(arquivo, loop=True):
@@ -57,10 +71,10 @@ def tocar_musica(arquivo, loop=True):
 
 MENU_LARGURA = 220
 MENU_X = W - MENU_LARGURA
-BOTAO_TAM = 100
-ESPACO_BOTOES = 25
+BOTAO_TAM = 70
+ESPACO_BOTOES = 15
 
-NUM_TORRES = 5
+NUM_TORRES = 7
 
 MENU_BOTOES = []
 
@@ -198,6 +212,8 @@ def tela_morte():
 
 class Enemy:
     def __init__(self, round_num):
+        self.poison_timer = 0
+        self.poison_dano = 0
         self.slow_timer = 0
         self.slow_factor = 1
         self.x, self.y = CAMINHO[0]
@@ -213,6 +229,9 @@ class Enemy:
         self.cor = VERMELHO
 
     def movimento(self):
+        if self.poison_timer > 0:
+            self.hp -= self.poison_dano
+            self.poison_timer -= 1
         if self.caminho >= len(CAMINHO) - 1:
             return "BASE"
 
@@ -415,17 +434,81 @@ class TeslaTower(Tower):
                 e.hp -= self.dano
 
             self.cd = 0
+
+class PoisonTower(Tower):
+    CUSTO = 100
+
+    def __init__(self, x, y):
+        super().__init__(x, y)
+        self.range = 140
+        self.dano = 2
+        self.cooldown = 45
+        self.duracao = 180
+
+    def desenhar(self, tela, mouse_pos):
+        rect = POISON_IMG.get_rect(center=(self.x + 10, self.y))
+        tela.blit(POISON_IMG, rect)
+
+        if self.mouse_em_cima(mouse_pos):
+            pygame.draw.circle(tela, (0,200,0), (self.x, self.y), self.range, 2)
+
+    def atirar(self, inimigos):
+        if self.cd < self.cooldown:
+            self.cd += 1
+            return
+
+        for e in inimigos:
+            if math.hypot(self.x-e.x, self.y-e.y) <= self.range:
+                e.poison_timer = self.duracao
+                e.poison_dano = self.dano
+                self.cd = 0
+                break
+
+class FireTower(Tower):
+    CUSTO = 150
+
+    def __init__(self, x, y):
+        super().__init__(x, y)
+        self.range = 150
+        self.dano = 150
+        self.cooldown = 300  # 5 segundos
+        self.aoe = 70        # raio da explosão
+
+    def desenhar(self, tela, mouse_pos):
+        rect = FIRE_IMG.get_rect(center=(self.x + 10, self.y))
+        tela.blit(FIRE_IMG, rect)
+
+        if self.mouse_em_cima(mouse_pos):
+            pygame.draw.circle(tela, (255,100,0), (self.x, self.y), self.range, 2)
+
+    def atirar(self, inimigos):
+        if self.cd < self.cooldown:
+            self.cd += 1
+            return
+
+        for alvo in inimigos:
+            if math.hypot(self.x - alvo.x, self.y - alvo.y) <= self.range:
+
+                # dano em área
+                for e in inimigos:
+                    if math.hypot(alvo.x - e.x, alvo.y - e.y) <= self.aoe:
+                        e.hp -= self.dano
+
+                self.cd = 0
+                break
 # HUD(não tenho muito o que dizer)
 
-def desenhar_menu(tela, sel, qg, qm, qs, qi, qt):
+def desenhar_menu(tela, sel, qg, qm, qs, qi, qt, qp, qf):
     pygame.draw.rect(tela, (35,35,35), (MENU_X, 0, MENU_LARGURA, H))
 
     torres = [
-        (TOWER_IMG, custo_progressivo(50, qg), "Guerreiro"),
-        (MAGE_IMG, custo_progressivo(80, qm), "Mago"),
-        (SNIPER_IMG, custo_progressivo(120, qs), "Sniper"),
-        (ICE_IMG, custo_progressivo(90, qi), "Gelo"),
-        (TESLA_IMG, custo_progressivo(140, qt), "Tesla"),
+        (MENU_TOWER_IMG, custo_progressivo(50, qg), "Guerreiro"),
+        (MENU_MAGE_IMG, custo_progressivo(80, qm), "Mago"),
+        (MENU_SNIPER_IMG, custo_progressivo(120, qs), "Sniper"),
+        (MENU_ICE_IMG, custo_progressivo(90, qi), "Gelo"),
+        (MENU_TESLA_IMG, custo_progressivo(140, qt), "Tesla"),
+        (MENU_POISON_IMG, custo_progressivo(100, qp), "Veneno"),
+        (MENU_FIRE_IMG, custo_progressivo(150, qf), "Fogo"),
     ]
 
     for i, (img, custo, nome) in enumerate(torres):
@@ -485,6 +568,8 @@ def main():
     qtd_sniper = 0
     qtd_ice = 0
     qtd_tesla = 0
+    qtd_poison = 0
+    qtd_fire = 0
 
     ouro, vida, round_num = 150, 10, 1
     spawn_timer = 0
@@ -548,6 +633,20 @@ def main():
                             ouro -= custo
                             qtd_tesla += 1
 
+                    elif selecionado == 5:
+                        custo = custo_progressivo(100, qtd_poison)
+                        if ouro >= custo:
+                            torres.append(PoisonTower(mx, my))
+                            ouro -= custo
+                            qtd_poison += 1
+
+                    elif selecionado == 6:
+                        custo = custo_progressivo(150, qtd_fire)
+                        if ouro >= custo:
+                            torres.append(FireTower(mx, my))
+                            ouro -= custo
+                            qtd_fire += 1
+
         if boss_fila > 0:
             spawn_timer += 1
             if spawn_timer >= spawn_delay_boss:
@@ -590,7 +689,7 @@ def main():
         for t in torres:
             t.desenhar(MAPA, mouse_pos)
 
-        desenhar_menu(MAPA, selecionado, qtd_guerreiro, qtd_mago, qtd_sniper, qtd_ice, qtd_tesla)
+        desenhar_menu(MAPA, selecionado, qtd_guerreiro, qtd_mago, qtd_sniper, qtd_ice, qtd_tesla, qtd_poison, qtd_fire)
         MAPA.blit(FONTE.render(f"$ {ouro}   vida: {vida}   Round {round_num}",True,BRANCO),(10,10))
         pygame.display.update()
 
